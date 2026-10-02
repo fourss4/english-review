@@ -200,6 +200,13 @@ class PipelineTest(unittest.TestCase):
             self.run_once(p)
         self.assertFalse((self.cfg.work / "2026-09-28_수업" / "done.json").exists())
 
+    def test_ai_result_reused_after_later_failure(self):
+        with self.assertRaises(ValidationError):
+            self.run_once(MockProvider({"extract": EXTRACT, "practice": "bad", "practice-retry": "bad"}))
+        p = MockProvider({"practice": PRACTICE})
+        self.assertEqual(self.run_once(p)["lessonId"], "les_20260928_01")
+        self.assertEqual([c["step"] for c in p.calls], ["practice"])  # 추출 단계는 다시 요청하지 않음
+
     def test_inputs_detection(self):
         (self.dir / "채팅.txt").write_text("x", encoding="utf-8")
         inp = read_inputs(self.dir)
