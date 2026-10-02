@@ -1,0 +1,21 @@
+{"exercises":[
+ {"ref":"cor_01","type":"choice","prompt":"가장 자연스러운 문장은?","options":["It's natural to ask age to other people.","It's natural to ask other people's age.","It's natural to ask other people age."],"answer":"it's natural to ask other people's age.","explanationKo":"ask + 사람의 나이"},
+ {"ref":"cor_01","type":"cloze","prompt":"In our culture, it's common to ask _____ age.","answer":"other people's","accept":["others'"],"promptKo":"우리 문화에서는 다른 사람의 나이를 묻는 것이 흔하다."},
+ {"ref":"cor_02","type":"cloze","prompt":"I get _____ on weekends.","answer":"bored"},
+ {"ref":"cor_02","type":"choice","prompt":"Pick the correct one.","options":["I am boring on weekends.","I am bored on weekends."],"answer":"I am bored on weekends."},
+ {"ref":"exp_01","type":"cloze","prompt":"Feel free to use the kitchen. _____.","answer":"Don't mind me"},
+ {"ref":"exp_01","type":"meaning","prompt":"Don't mind me","answer":"저 신경 쓰지 마세요 — 상대가 나 때문에 불편해하지 않게 할 때"},
+ {"ref":"exp_02","type":"meaning","prompt":"raise (your) voice","answer":"언성을 높이다"},
+ {"ref":"exp_02","type":"situation","promptKo":"화가 나서 큰 소리로 말하는 사람을 묘사할 때","options":["raise their voices","rise their voices","lift their voices"],"answer":"raise their voices"},
+ {"ref":"up_01","type":"situation","promptKo":"너무 피곤해서 오늘 일을 그만하자고 할 때","prompt":"Which expression fits?","options":["Let's call it a day.","Let's call it a night off.","Let's day it."],"answer":"Let's call it a day."},
+ {"ref":"up_01","type":"cloze","prompt":"I was so beat that I _____.","answer":"called it a day"},
+ {"ref":"up_02","type":"cloze","prompt":"The party was _____ _____.","answer":"a blast"},
+ {"ref":"up_02","type":"meaning","prompt":"It was a blast.","answer":"정말 재미있었다"},
+ {"ref":"up_03","type":"situation","promptKo":"잘 모르는 주제가 나왔을 때","options":["I'm not really familiar with it.","I don't know well about it."],"answer":"I'm not really familiar with it."},
+ {"ref":"up_03","type":"cloze","prompt":"I'm not really _____ with that area.","answer":"familiar"},
+ {"ref":"up_99","type":"cloze","prompt":"x _____","answer":"y"}
+],
+"prep":{"expressions":[{"ref":"up_01","text":"call it a day","howToUseKo":"수업 끝날 때 써 보세요"},{"ref":"up_02","text":"It was a blast","howToUseKo":"주말 이야기할 때"},{"ref":"exp_01","text":"Don't mind me","howToUseKo":"양해 구할 때"}],
+ "questions":["What do you usually do when you feel bored?","Is it rude to ask someone's age in your country?","How do you deal with stress?"]},
+"opic":[{"question":"Tell me about a time you felt exhausted after a long day.","questionKo":"긴 하루 끝에 지쳤던 경험","structureKo":["상황 소개","무엇을 했는지","느낀 점"],"targetRefs":["up_01","up_02"],"seconds":90},
+        {"question":"Describe a cultural difference you noticed.","structureKo":["도입","예시","마무리"],"targetRefs":["cor_01","bogus"],"seconds":999}]}
