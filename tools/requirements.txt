@@ -1,0 +1,4 @@
+# PC 수업 처리기 의존성 (설치: tools\setup.bat)
+# 버전은 작성 시점 기준 하한만 지정. 설치 후 취약점·라이선스는 pip-audit 등으로 점검 권장.
+faster-whisper>=1.0   # MIT — 로컬 음성 인식(Whisper, CTranslate2)
+jsonschema>=4.0       # MIT — 결과 형식 검증
