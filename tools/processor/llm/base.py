@@ -38,12 +38,16 @@ def post_json(url: str, headers: dict, body: dict, timeout: int, retries: int = 
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
-            kind = ""
+            kind, detail = "", ""
             try:
-                kind = json.loads(e.read().decode("utf-8")).get("error", {}).get("type", "")
+                err = json.loads(e.read().decode("utf-8")).get("error", {})
+                kind = err.get("type", "") if isinstance(err, dict) else ""
+                # 공급자 오류 설명(요청 형식 문제 안내). 키·수업 내용은 포함되지 않는다. 길이 제한
+                detail = str(err.get("message", ""))[:300] if isinstance(err, dict) else ""
             except Exception:  # noqa: BLE001 - 오류 본문 해석 실패는 무시
                 pass
-            last = ProviderError(f"AI 호출 실패 (HTTP {e.code}{', ' + kind if kind else ''})")
+            last = ProviderError(f"AI 호출 실패 (HTTP {e.code}{', ' + kind if kind else ''}){': ' + detail if detail else ''}")
+            last.status, last.detail = e.code, detail
             if e.code in (429, 500, 502, 503, 504, 529) and attempt < retries:
                 time.sleep(2 ** (attempt + 2))
                 continue
