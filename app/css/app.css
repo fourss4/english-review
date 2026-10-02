@@ -140,3 +140,4 @@ details.mini { margin-top: 4px; }
 #manual { margin-top: 28px; }
 .opt:disabled { opacity: 1; }
 .opic-start { margin-top: 8px; }
+button.play.on { color: var(--danger); font-weight: 600; }
