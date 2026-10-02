@@ -1,0 +1,35 @@
+# 실제 수업 데이터 (개인정보) - 절대 커밋 금지
+/data/
+/private/
+*.mp3
+*.m4a
+*.wav
+*.mp4
+!samples/**/*.mp4
+!samples/**/*.mp3
+!samples/**/*.m4a
+
+# 백업 파일
+*.backup.zip
+backup-*.zip
+
+# 환경변수 / 자격증명
+.env
+.env.*
+
+# 빌드/의존성
+node_modules/
+dist/
+.DS_Store
+
+# 백업 ZIP (english-review-backup-*.zip)
+english-review-backup-*.zip
+
+# PC 수업 처리기: 설정·키·가상환경·캐시 (수업 데이터는 private/ 에만)
+tools/.env
+tools/config.toml
+tools/.venv/
+__pycache__/
+*.pyc
+lesson-les_*.zip
+weekly-*.zip
