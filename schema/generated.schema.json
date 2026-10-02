@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "generated.schema.json",
+  "title": "GeneratedContent",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "kind",
+    "generator",
+    "items"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^gen_[A-Za-z0-9_]+$"
+    },
+    "lessonId": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "quiz",
+        "example_sentences",
+        "dialogue",
+        "expression_upgrade"
+      ]
+    },
+    "generator": {
+      "type": "object",
+      "required": [
+        "tool",
+        "provider",
+        "createdAt"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "multiple_choice",
+              "fill_blank",
+              "translate",
+              "free_text",
+              "fix_sentence",
+              "upgrade"
+            ]
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "answerIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "answer": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "enum": [
+              "slang",
+              "idiom",
+              "better_expression"
+            ]
+          },
+          "original": {
+            "type": "string"
+          },
+          "originalOffsetSec": {
+            "type": "number",
+            "minimum": 0
+          },
+          "suggestion": {
+            "type": "string"
+          },
+          "meaningKo": {
+            "type": "string"
+          },
+          "register": {
+            "enum": [
+              "casual",
+              "neutral",
+              "formal"
+            ]
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "en"
+              ],
+              "properties": {
+                "en": {
+                  "type": "string"
+                },
+                "ko": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "situationKo": {
+            "type": "string"
+          },
+          "opicQuestion": {
+            "type": "string"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "upgrade"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "category",
+                "original",
+                "suggestion",
+                "meaningKo",
+                "explanation",
+                "examples",
+                "situationKo",
+                "opicQuestion"
+              ],
+              "properties": {
+                "examples": {
+                  "minItems": 2,
+                  "maxItems": 3
+                }
+              }
+            },
+            "else": {
+              "required": [
+                "prompt"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "koFills": {
+      "type": "array",
+      "description": "기존 수업 항목의 한국어 뜻 채우기(ADR 0003 보완). 앱이 ref로 찾아 비어 있는 칸만 채움",
+      "items": {
+        "type": "object",
+        "required": [
+          "ref"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "pattern": "^(exp|cor)_[0-9]+$"
+          },
+          "meaningKo": {
+            "type": "string"
+          },
+          "situationKo": {
+            "type": "string"
+          },
+          "examplesKo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "naturalKo": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

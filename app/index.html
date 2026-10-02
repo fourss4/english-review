@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; media-src 'self' blob:; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#1f5f8b">
+  <title>영어 복습</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="top">
+    <h1>영어 복습</h1>
+    <nav>
+      <button type="button" data-view="review" class="tab active">복습</button>
+      <button type="button" data-view="list" class="tab">수업</button>
+      <button type="button" data-view="import" class="tab">가져오기</button>
+      <button type="button" data-view="settings" class="tab">설정</button>
+    </nav>
+  </header>
+  <div id="upd-banner" class="banner" hidden>
+    새 버전이 있습니다. <button type="button" id="upd-apply" class="primary">지금 업데이트</button>
+  </div>
+
+  <main>
+    <!-- 복습 -->
+    <section id="view-review" class="view">
+      <div id="bk-remind" class="warn" hidden>
+        <span id="bk-remind-text"></span>
+        <button type="button" id="bk-remind-go" class="link">백업하러 가기</button>
+      </div>
+      <div id="rv-home">
+        <div class="stats">
+          <div><strong id="rv-due">0</strong><span>복습 예정</span></div>
+          <div><strong id="rv-new">0</strong><span>새 카드</span></div>
+          <div><strong id="rv-total">0</strong><span>전체 카드</span></div>
+        </div>
+        <button type="button" id="rv-start" class="primary wide">오늘 복습 시작</button>
+        <p id="rv-note" class="muted"></p>
+        <details>
+          <summary>설정 · 내보내기</summary>
+          <label>하루 새 카드 수
+            <input type="number" id="rv-newlimit" min="0" max="200" step="1">
+          </label>
+          <button type="button" id="rv-export">Anki용 TSV 내보내기</button>
+        </details>
+      </div>
+      <div id="rv-session" hidden>
+        <div class="row-between"><span id="rv-progress" class="muted"></span><button type="button" id="rv-quit" class="link">그만하기</button></div>
+        <div class="flash">
+          <div id="rv-kind" class="muted"></div>
+          <div id="rv-front" class="front"></div>
+          <div id="rv-input-wrap" hidden>
+            <textarea id="rv-input" rows="3" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>
+            <button type="button" id="rv-check" class="primary wide">확인</button>
+          </div>
+          <button type="button" id="rv-show" class="primary wide">정답 보기</button>
+          <div id="rv-result" hidden></div>
+          <div id="rv-back" class="back" hidden></div>
+        </div>
+        <div id="rv-grades" class="grades" hidden></div>
+      </div>
+      <div id="rv-done" hidden>
+        <h2>복습 완료</h2>
+        <p id="rv-done-msg"></p>
+        <button type="button" id="rv-done-home" class="primary">처음으로</button>
+      </div>
+    </section>
+
+    <!-- 수업 목록 -->
+    <section id="view-list" class="view" hidden>
+      <input type="search" id="q" placeholder="표현·교정·채팅 검색 (2글자 이상)" aria-label="수업 검색" autocomplete="off">
+      <div id="q-results" hidden></div>
+      <p id="storage" class="muted"></p>
+      <ul id="lessons" class="cards"></ul>
+      <p id="empty" class="muted" hidden>아직 가져온 수업이 없습니다. "가져오기"에서 시작하세요.</p>
+    </section>
+
+    <!-- 수업 상세 -->
+    <section id="view-detail" class="view" hidden>
+      <button type="button" id="back" class="link">← 목록</button>
+      <h2 id="d-title"></h2>
+      <p id="d-meta" class="muted"></p>
+      <audio id="d-audio" controls preload="metadata"></audio>
+      <div id="player" class="player" hidden>
+        <div class="prow">
+          <button type="button" id="p-back">−5초</button>
+          <button type="button" id="p-fwd">+5초</button>
+          <span id="p-speeds" class="seg"></span>
+        </div>
+        <div class="prow">
+          <button type="button" id="p-a">A 시작</button>
+          <button type="button" id="p-b">B 끝</button>
+          <button type="button" id="p-clear">반복 해제</button>
+        </div>
+        <p id="p-status" class="muted" aria-live="polite"></p>
+        <div class="prow">
+          <input type="text" id="p-label" maxlength="200" placeholder="구간 메모 (선택)">
+          <button type="button" id="p-save" disabled>구간 저장</button>
+        </div>
+        <div class="prow">
+          <button type="button" id="p-rec">● 내 목소리 녹음</button>
+          <button type="button" id="p-compare" disabled>원본 → 내 녹음 듣기</button>
+        </div>
+        <p id="p-rec-msg" class="muted"></p>
+        <audio id="p-mine" controls hidden></audio>
+        <h4>저장한 구간</h4>
+        <ul id="p-bookmarks" class="bms"></ul>
+        <button type="button" id="p-vtt" disabled>구간 VTT 내보내기</button>
+      </div>
+      <button type="button" id="d-review" class="primary wide">이 수업 카드 복습</button>
+      <div id="d-body"></div>
+      <details id="d-chat-wrap" hidden>
+        <summary>채팅 원문 보기</summary>
+        <pre id="d-chat" class="raw"></pre>
+      </details>
+      <button type="button" id="d-delete" class="danger">휴지통으로 이동</button>
+    </section>
+
+    <!-- 가져오기 -->
+    <section id="view-import" class="view" hidden>
+      <form id="import-form" autocomplete="off">
+        <label>녹음 파일 (mp4 / m4a)
+          <input type="file" id="f-audio" accept=".mp4,.m4a,audio/mp4,video/mp4">
+        </label>
+        <p id="f-audio-info" class="muted"></p>
+        <label>채팅 (복사해서 붙여넣기)
+          <textarea id="f-chat" rows="6" placeholder="❌: ... / ✅: ... / 💡: ..."></textarea>
+        </label>
+        <label>코멘트 (복사해서 붙여넣기)
+          <textarea id="f-comment" rows="6"></textarea>
+        </label>
+        <label>수업 날짜
+          <input type="date" id="f-date">
+        </label>
+        <button type="submit" class="primary">변환 미리보기</button>
+      </form>
+
+      <div id="preview" hidden>
+        <h2>미리보기 · 수정</h2>
+        <div id="report"></div>
+        <div id="pv-fields"></div>
+        <div class="row">
+          <button type="button" id="pv-cancel">취소</button>
+          <button type="button" id="pv-save" class="primary">저장</button>
+        </div>
+      </div>
+      <p id="import-msg" role="status"></p>
+    </section>
+
+    <!-- 설정 -->
+    <section id="view-settings" class="view" hidden>
+      <h2>백업</h2>
+      <p id="bk-last" class="muted"></p>
+      <label class="check"><input type="checkbox" id="bk-audio" checked> 녹음 파일 포함 (끄면 용량이 작아지지만 녹음은 복원되지 않음)</label>
+      <button type="button" id="bk-export" class="primary wide">백업 ZIP 내보내기</button>
+      <p id="bk-msg" class="muted" role="status"></p>
+      <p class="muted">백업 파일에는 수업 녹음·내용이 들어 있습니다. 개인 저장공간(내 휴대폰, 개인 클라우드)에만 보관하고 GitHub 등 공개된 곳에는 올리지 마세요.</p>
+
+      <h2>백업 복원</h2>
+      <label>백업 ZIP 선택
+        <input type="file" id="rs-file" accept=".zip,application/zip">
+      </label>
+      <div id="rs-preview" hidden>
+        <div id="rs-summary"></div>
+        <fieldset id="rs-policy" class="policy">
+          <legend>이미 있는 수업과 ID가 같을 때</legend>
+          <label class="check"><input type="radio" name="rs-policy" value="skip" checked> 기기에 있는 것 유지(건너뛰기)</label>
+          <label class="check"><input type="radio" name="rs-policy" value="overwrite"> 백업으로 덮어쓰기</label>
+        </fieldset>
+        <button type="button" id="rs-apply" class="primary wide">복원하기</button>
+      </div>
+      <p id="rs-msg" role="status"></p>
+
+      <h2>앱</h2>
+      <p id="app-info" class="muted"></p>
+      <p id="storage2" class="muted"></p>
+      <button type="button" id="upd-check">업데이트 확인</button>
+      <button type="button" data-view="trash" class="go">휴지통 열기</button>
+    </section>
+
+    <!-- 휴지통 -->
+    <section id="view-trash" class="view" hidden>
+      <button type="button" data-view="settings" class="link go">← 설정</button>
+      <p class="muted">휴지통의 수업은 목록에 보이지 않습니다. 복원하거나 영구 삭제할 수 있습니다.</p>
+      <ul id="trash" class="cards"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

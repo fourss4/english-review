@@ -1,0 +1,49 @@
+# GitHub Pages 배포: main 브랜치에 push하면 테스트 후 app/ 폴더만 배포한다.
+# 저장소 Settings → Pages → Source를 "GitHub Actions"로 설정해야 동작한다.
+# 액션 버전(@v4 등)은 작성 시점(2026-10) 기준이며, 경고가 나오면 최신 주 버전으로 올린다.
+name: Deploy app to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run tests
+        run: node --test tests/*.test.mjs
+      - name: Guard - no lesson data in app folder
+        run: |
+          if find app -type f \( -iname '*.mp4' -o -iname '*.m4a' -o -iname '*.zip' -o -iname '*.mp3' -o -iname '*.wav' \) | grep -q .; then
+            echo "app 폴더에 녹음/백업 파일이 있습니다. 배포를 중단합니다."; exit 1
+          fi
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
+      - id: deployment
+        uses: actions/deploy-pages@v4

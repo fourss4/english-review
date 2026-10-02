@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lesson.schema.json",
+  "title": "Lesson",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "date",
+    "expressions",
+    "corrections",
+    "chat",
+    "source"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^les_[A-Za-z0-9_]+$"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "title": {
+      "type": "string"
+    },
+    "tutorAlias": {
+      "type": "string",
+      "pattern": "^T[0-9]{2,}$"
+    },
+    "durationSec": {
+      "type": "number",
+      "minimum": 0
+    },
+    "audio": {
+      "type": "object",
+      "required": [
+        "file",
+        "mimeType"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "mimeType": {
+          "enum": [
+            "video/mp4",
+            "audio/mpeg",
+            "audio/mp4",
+            "audio/aac",
+            "audio/wav",
+            "audio/ogg",
+            "audio/webm"
+          ]
+        },
+        "durationSec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "originalFileName": {
+          "type": "string"
+        }
+      }
+    },
+    "transcript": {
+      "type": "object",
+      "required": [
+        "file"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+\\.vtt$"
+        },
+        "generator": {
+          "type": "string"
+        }
+      }
+    },
+    "expressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "meaning": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isKey": {
+            "type": "boolean"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "partOfSpeech": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "en"
+              ],
+              "properties": {
+                "en": {
+                  "type": "string"
+                },
+                "ko": {
+                  "type": "string"
+                },
+                "speaker": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "corrections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "original",
+          "corrected"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "original": {
+            "type": "string"
+          },
+          "corrected": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "grammar",
+              "vocabulary",
+              "pronunciation",
+              "expression",
+              "other"
+            ]
+          },
+          "natural": {
+            "type": "string"
+          },
+          "explanationLong": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chat": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "speaker",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "offsetSec": {
+            "type": "number",
+            "minimum": 0
+          },
+          "speaker": {
+            "enum": [
+              "me",
+              "tutor",
+              "system"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "app",
+        "importedAt",
+        "parserVersion"
+      ],
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "importedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "parserVersion": {
+          "type": "string"
+        },
+        "raw": {
+          "type": "object",
+          "description": "붙여넣은 원문 보존(재변환용). 내보내기 포함, AI 프롬프트에는 미포함",
+          "properties": {
+            "comment": {
+              "type": "string"
+            },
+            "chat": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "course": {
+      "type": "string"
+    },
+    "lessonNo": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "feedback": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

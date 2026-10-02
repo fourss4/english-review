@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "les_20260101_01",
+  "date": "2026-01-01T00:00:00+09:00",
+  "course": "일상 영어 표현",
+  "lessonNo": 3,
+  "title": "천천히 하세요",
+  "audio": { "file": "audio.mp4", "mimeType": "audio/mp4", "originalFileName": "demo_260101_일상 영어 표현 - 3 천천히 하세요.m4a.mp4" },
+  "feedback": { "summary": "You explain your daily routine clearly and you're comfortable using simple connectors like \"and\" and \"because.\" One area to polish is choosing more natural verbs, such as \"rush\" instead of \"hurry\" in some situations. Overall, your English is easy to follow." },
+  "expressions": [
+    { "id": "exp_01", "text": "Take your time", "isKey": true, "pattern": "take + A + time",
+      "examples": [ { "speaker": "A", "en": "Sorry, I'm still choosing." }, { "speaker": "B", "en": "No worries. Take your time." } ] },
+    { "id": "exp_02", "text": "rush through (something)", "partOfSpeech": "phrasal verb", "definition": "to do something too quickly",
+      "examples": [ { "en": "I always rush through lunch at the office." } ] }
+  ],
+  "corrections": [
+    { "id": "cor_01", "original": "I always hurry when I eat lunch at my office.", "corrected": "I always rush when I eat lunch at the office.",
+      "explanation": "Use \"rush\" and \"at the office\" instead of \"hurry\" and \"at my office.\"", "natural": "I always rush through lunch at the office." },
+    { "id": "cor_02", "original": "My hobby is watching movie in the weekend.", "corrected": "My hobby is watching movies on the weekend.",
+      "explanation": "Use plural \"movies\" and \"on the weekend.\"", "natural": "I like to watch movies on weekends.",
+      "explanationLong": "In English, we usually say \"on the weekend\" rather than \"in the weekend,\" and we use the plural \"movies\" when talking about movies in general." }
+  ],
+  "chat": [],
+  "source": { "app": "langdy", "importedAt": "2026-01-02T08:00:00.000Z", "parserVersion": "langdy-v1" }
+}
