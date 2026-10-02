@@ -63,8 +63,17 @@ def render(tpl: str, **v) -> str:
     return tpl
 
 
-def ask_json(provider, system, user, step, validator, warnings):
-    """AI 호출 → JSON 추출 → 검증. 실패하면 이유를 알려 1회 재요청."""
+def ask_json(provider, system, user, step, validator, warnings, cache: Path | None = None):
+    """AI 호출 → JSON 추출 → 검증. 실패하면 이유를 알려 1회 재요청.
+    cache: 성공한 응답을 저장해 두는 파일. 다음 단계에서 실패해 다시 실행할 때 같은 요청을 다시 보내지 않는다(요금 절약)."""
+    if cache and cache.is_file():
+        try:
+            data, w = validator(json.loads(cache.read_text(encoding="utf-8")))
+            data.pop("_badRatio", None)
+            log(f"    (저장된 {step} 결과 재사용)")
+            return data
+        except (ValueError, ValidationError):
+            pass
     last_err = None
     for attempt in range(2):
         prompt = user if attempt == 0 else (
@@ -78,6 +87,8 @@ def ask_json(provider, system, user, step, validator, warnings):
                 continue
             data.pop("_badRatio", None)
             warnings.extend(w)
+            if cache:
+                cache.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
             return data
         except (ValueError, ValidationError) as e:
             last_err = str(e)[:200]
@@ -180,7 +191,7 @@ def process_lesson(d: Path, cfg, provider, stt_fn=None, force: bool = False) -> 
     log(f"  · AI 정리 1/2 (교정·표현·업그레이드) — {provider.name}")
     sys1, usr1 = load_prompt("extract")
     data = ask_json(provider, sys1, render(usr1, title=title, transcript=t_masked, chat=c_masked, comment=m_masked),
-                    "extract", validate_extract, warnings)
+                    "extract", validate_extract, warnings, cache=None if force else work / "ai-extract.json")
     assign_ids(data)
     refs = {x["id"] for k in ("corrections", "expressions", "upgrades") for x in data[k]}
 
@@ -189,7 +200,7 @@ def process_lesson(d: Path, cfg, provider, stt_fn=None, force: bool = False) -> 
     sys2, usr2 = load_prompt("practice")
     items = json.dumps(items_for_practice(data), ensure_ascii=False, indent=1)
     prac = ask_json(provider, sys2, render(usr2, title=title, items=items), "practice",
-                    lambda o: validate_practice(o, refs), warnings)
+                    lambda o: validate_practice(o, refs), warnings, cache=None if force else work / "ai-practice.json")
     counter: dict[str, int] = {}
     for ex in prac["exercises"]:
         counter[ex["ref"]] = counter.get(ex["ref"], 0) + 1

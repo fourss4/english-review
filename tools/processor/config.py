@@ -17,11 +17,11 @@ TOOLS = ROOT / "tools"
 class LLMConfig:
     provider: str = "anthropic"          # anthropic | openai_compat | manual | mock
     model: str = ""                      # 예: Anthropic 콘솔의 모델 ID (반드시 직접 입력)
-    max_tokens: int = 8000
+    max_tokens: int = 32000
     temperature: float = 0.3
     api_key_env: str = "ANTHROPIC_API_KEY"
     base_url: str = ""                   # openai_compat 전용 (예: https://api.openai.com/v1)
-    timeout_sec: int = 180
+    timeout_sec: int = 600
 
 
 @dataclass
