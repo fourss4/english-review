@@ -6,7 +6,7 @@ import {
 } from './db.js';
 import { lessonItems, variantsFor, pickVariant, checkTyped, shuffled, syncLessonCards, migrateLegacyCards, toAnkiTsv, TYPE_LABEL, KIND_LABEL } from './cards.js';
 import { GRADES, review, previewIntervals, buildQueue, buildWrongQueue, localDate, isNew } from './srs.js';
-import { initPlayer, loadPlayer, unloadPlayer, seek } from './player.js';
+import { initPlayer, loadPlayer, unloadPlayer, seek, toggleClip, clipRange, activeClip } from './player.js';
 import { searchLessons, splitByRanges } from './search.js';
 import { readPackage, PackageError } from './package.js';
 import { exportProgress, parseProgress, mergeProgress } from './progress.js';
@@ -136,9 +136,24 @@ async function runSearch() {
 // ---------- 상세 ----------
 let detail = { lesson: null, hasAudio: false, segEls: [], segIdx: -1 };
 
-function playBtn(sec) {
+// 표현이 나온 구간 재생 버튼: 누르면 재생(▶), 재생 중 다시 누르면 정지(■). 구간 끝에서 자동 정지
+function playBtn(sec, key) {
   if (!detail.hasAudio || !Number.isFinite(sec)) return null;
-  return el('button', { type: 'button', class: 'link play', onclick: () => seek(sec) }, `▶ ${fmtClock(sec)}`);
+  const btn = el('button', { type: 'button', class: 'link play', 'data-clip': key, 'aria-label': `${fmtClock(sec)} 구간 재생`,
+    onclick: () => toggleClip(key, clipRange(sec, detail.lesson.transcript?.segments || [])) });
+  paintClipBtn(btn, activeClip() === key, sec);
+  btn.dataset.sec = String(sec);
+  return btn;
+}
+
+function paintClipBtn(btn, playing, sec = Number(btn.dataset.sec)) {
+  btn.textContent = playing ? `■ 정지` : `▶ ${fmtClock(sec)}`;
+  btn.classList.toggle('on', playing);
+  btn.setAttribute('aria-label', playing ? '구간 재생 정지' : `${fmtClock(sec)} 구간 재생`);
+}
+
+function onClip(key) {
+  for (const b of document.querySelectorAll('#d-body button[data-clip]')) paintClipBtn(b, b.dataset.clip === key);
 }
 
 function hideToggle(ref) {
@@ -168,13 +183,13 @@ function section(title, note, nodes) {
 function renderDetailBody() {
   const l = detail.lesson;
   const ups = (l.upgrades || []).map((u, i) => itemBox(u.id, `업그레이드 ${i + 1} · ${CATEGORY[u.category] || u.category}${u.register ? ` · ${REGISTER[u.register] || u.register}` : ''}`,
-    el('div', { class: 'said' }, el('small', {}, '내가 한 말 '), u.original, ' ', playBtn(u.offsetSec)),
+    el('div', { class: 'said' }, el('small', {}, '내가 한 말 '), u.original, ' ', playBtn(u.offsetSec, u.id)),
     el('div', { class: 'good big' }, '→ ', u.suggestion),
     u.meaningKo ? el('div', {}, u.meaningKo) : null,
     u.explanationKo ? el('div', { class: 'tip' }, u.explanationKo) : null,
     ...exampleNodes(u.examples)));
   const cors = (l.corrections || []).map((c, i) => itemBox(c.id, `교정 ${i + 1}`,
-    el('div', { class: 'bad' }, '❌ ', c.original, ' ', playBtn(c.offsetSec)),
+    el('div', { class: 'bad' }, '❌ ', c.original, ' ', playBtn(c.offsetSec, c.id)),
     el('div', { class: 'good' }, '✅ ', c.corrected, ' ', c.ai?.corrected ? aiBadge() : null),
     c.natural ? el('div', { class: 'good' }, '✨ ', c.natural, ' ', c.ai?.natural ? aiBadge() : null) : null,
     c.meaningKo ? el('div', { class: 'tip' }, `뜻: ${c.meaningKo}`) : null,
@@ -279,7 +294,7 @@ async function openDetail(id) {
   audio.hidden = !a;
   detail.hasAudio = !!a;
   if (a) { currentAudioUrl = URL.createObjectURL(a.blob); audio.src = currentAudioUrl; }
-  loadPlayer(!!a, onTime);
+  loadPlayer(!!a, onTime, onClip);
   renderDetailBody();
   renderTranscript(l);
   const raw = l.source?.raw || {};
