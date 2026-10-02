@@ -1,7 +1,23 @@
-# 데이터 명세 (data-spec) v0.1 — schemaVersion 1
+# 데이터 명세 (data-spec) v0.2 — schemaVersion 2
 
 > 이 문서와 `/schema/*.json`이 앱·도구 간 계약입니다. 변경 시 이 문서를 먼저 수정하고 `schemaVersion`을 올린 뒤 마이그레이션 함수를 추가합니다.
-> 상태: 초안. 원본 샘플 분석 후 필드 확정.
+> v2(2026-10-02, ADR 0006·0007): PC 수업 처리기가 수업 패키지를 만들고 앱은 읽기만 한다. 아래 "v2 요약"이 현재 형식이며, 1~7장은 v1(구버전) 기록으로 보존한다.
+
+## v2 요약 (현재)
+| 형식 | 스키마 | 만드는 곳 → 쓰는 곳 |
+|---|---|---|
+| 수업 패키지 ZIP | `schema/package.schema.json` | 처리기 → 앱 가져오기. `manifest.json`(맨 앞) + `lesson.json` + `audio.<ext>`(무압축) + `transcript.vtt`. 파일명은 `[A-Za-z0-9._-]`만, 모든 파일에 SHA-256 |
+| 수업 v2 | `schema/lesson.schema.json` | `corrections`(`ai.corrected/natural` = AI가 대신 만든 칸), `expressions`, `upgrades`(정확히 3개 생성, `category` slang/idiom/better_expression, `meaningKo`·`explanationKo`·`examples`), `exercises`, `prep`, `opic`, `transcript.segments`, `hidden`(복습 제외 항목 ID) |
+| 복습 문제 | lesson.exercises | `{id: ex_<ref>_<n>, ref: cor_/exp_/up_, type: cloze/choice/situation/meaning, prompt, answer, options?, accept?, promptKo?, explanationKo?}`. cloze는 `_____` 정확히 1개, choice·situation은 options에 answer 포함. 항목당 2개 이상 유형. 문제가 없는 항목은 앱이 기본 문제를 만든다(`cards.js fallbackExercises`) |
+| 주간 요약 패키지 | `schema/weekly.schema.json` | 처리기 `weekly` → 앱 수업 탭. id `wk_YYYYWww`(ISO 주) |
+| 카드 v2 | `schema/card.schema.json` | 앱 내부. 카드 1장 = 학습 항목 1개, id `crd_<수업ID에서 les_ 뺀 것>_<ref>`. `srs`(srs2), `log[{at, grade, type, correct, mode}]`, `wrong{since, lastType}`, `suspended` |
+| 학습 기록 | `schema/progress.schema.json` | 앱 설정 → JSON 내보내기/가져오기(`format: english-review-progress`). 합칠 때 log는 합집합, srs·wrong은 마지막 풀이가 최근인 쪽 |
+
+**srs2:** 등급 1(다시)/3(어려움)/4(보통)/5(쉬움). 처음 맞힘 1/3/5일, 이후 어려움 ×1.2 · 보통 ×ease · 쉬움 ×ease×1.3(최소 +1일, 버튼 간 최소 1일 차이). 다시 = 오늘, ease −0.2, lapses+1. ease 1.3~3.0.
+
+**마이그레이션:** `app/js/migrations.js` 수업 v1→v2(총평 제거, `meaning→meaningKo`, `explanation(+Long)→explanationKo`, `naturalKo→meaningKo`, `source.migratedFrom: 1`). 카드 v1(방향별 여러 장) → v2(항목별 1장, 가장 긴 간격 이어받기): `cards.js migrateLegacyCards`. 앱 시작 시 자동 실행.
+
+**IndexedDB v4:** `lessons`, `audio`, `cards`(색인 `lessonId`), `summaries`(주간 요약), `meta`, `bookmarks`(v0.8부터 미사용, 보존).
 
 ## 공통 규칙
 - 인코딩: UTF-8, 줄바꿈 LF
@@ -48,6 +64,7 @@
   - corrections[]: `natural`(💡 다음 ✅ — 더 자연스러운 표현), `explanationLong`(코멘트의 긴 해설)
   - 랭디 채팅은 화자·시각 없이 강사의 교정 노트 형식이라 `chat[]`은 비워 두고 원문은 `source.raw.chat`에 보존
   - 기대 변환 예시: `/samples/normalized/les_20260101_01/lesson.json`
+- **AI로 교정 찾기(ADR 0005)**: `corrections[].naturalKo`(한국어 뜻), `source.aiAssisted {at, provider?}`. AI 결과 형식은 `schema/lesson-structure.schema.json`, 예시 `samples/ai/lesson-demo-02-structure.json`
 - `corrections[].category`: `grammar | vocabulary | pronunciation | expression | other`
 
 ## 2. Card (`review/cards.json`) — `schema/card.schema.json`

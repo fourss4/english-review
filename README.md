@@ -1,78 +1,79 @@
 # 영어회화 복습 PWA (프로토타입)
 
-랭디 영어회화 수업의 녹음·코멘트·채팅을 가져와 Android에서 오프라인으로 복습하고,
-AI로 OPIc IH 수준 표현을 추가 학습하는 개인용 모바일 웹앱입니다.
+랭디 영어회화 수업의 녹음·코멘트·채팅을 **PC에서 한 번 정리**(녹음 → 텍스트, AI로 교정·표현·업그레이드 추출)해
+휴대폰(Android)에서 오프라인으로 복습하는 개인용 앱입니다.
 
-> 현재 상태: **M5 완료 (2026-10-02) — 휴대폰 설치 가능 단계**
-> 가져오기, 수업 목록·상세·검색, 복습 카드(SM-2·문장 고치기·빈칸·Anki TSV), 녹음 플레이어(A-B 반복·구간 저장·쉐도잉),
-> **오프라인 실행(서비스 워커), 홈 화면 설치, 전체 백업 ZIP 내보내기·복원, 업데이트 알림** 동작.
-> 다음 단계: ① GitHub Pages 배포(직접 진행, `docs/github-pages-guide.md`) ② 06-1 녹음 텍스트 변환(STT)
+> 현재 상태: **v0.8.0 (2026-10-02)** — 배포 주소: https://fourss4.github.io/english-review/
+> PC 수업 처리기(tools/, ADR 0006) + 앱 재설계(ADR 0007): 수업 패키지 가져오기, 표현 업그레이드 3개, AI 교정·표현,
+> 빈칸·고르기·상황·뜻 문제 자동 채점, 오답 복습(다른 유형으로), 다음 수업 준비, OPIc 모의 답변, 주간 요약, 학습 기록 내보내기.
 
-## 확정된 사용 환경
-| 항목 | 내용 |
+## 전체 흐름
+```
+[PC] private\inbox\<수업폴더>\  (녹음 mp4 + chat.txt + comment.txt)
+   └─ tools\process.bat ─→ 녹음 → 텍스트(PC 안에서, faster-whisper)
+                          → 이름·연락처 가림 → Claude API(교체 가능)로 교정·표현·업그레이드 3개·복습 문제 생성
+                          → private\out\lesson-les_....zip
+[휴대폰] 앱 → 가져오기 → ZIP 선택 → 오프라인 복습
+```
+- 녹음은 PC 밖으로 나가지 않습니다. AI에는 이름을 가린 **텍스트만** 보냅니다.
+- AI 공급자는 `tools\config.toml`의 `provider`·`model`만 바꾸면 교체됩니다(anthropic / openai_compat / manual).
+- PC 설치·사용법: **`tools/README.md`**
+
+## 주요 기능 (앱)
+| 구분 | 내용 |
 |---|---|
-| 기기 | Android Chrome, 홈 화면에 설치(PWA)해서 사용 |
-| 입력 | 녹음 mp4 파일 선택 + 코멘트·채팅 텍스트 붙여넣기 |
-| 저장 | 기기 내 IndexedDB, 오프라인 사용. 백업은 ZIP 내보내기/복원 |
-| 배포 | GitHub Pages(공개 저장소)에 **앱 코드만** 배포. 수업 데이터는 올리지 않음 |
-| 분량 | 주 2~3회, 회당 약 20분 녹음 |
+| 수업 화면 | 녹음(속도·±5초), 스크립트(줄을 누르면 그 위치 재생), **표현 업그레이드 3개**(내가 한 말 → 슬랭·관용구·더 좋은 표현, 뜻·예문), 교정(AI가 대신 만든 칸은 "AI 생성" 표시), 표현, 항목별 "복습에서 빼기" |
+| 복습 | 항목마다 문제 유형을 돌아가며 출제: 빈칸 채우기(짧은 표현만 입력), 옳은 것 고르기, 상황에 맞는 표현, 뜻·쓰임 떠올리기. 고르기·빈칸은 자동 채점 |
+| 간격 | 처음 맞히면 어려움 1일 · 보통 3일 · 쉬움 5일, 이후 점점 길어짐(버튼마다 최소 1일 차이). 틀리면 오늘 다시 |
+| 오답 복습 | 수업과 관계없이 틀린 항목만 모아 **마지막에 틀린 유형과 다른 유형**으로 다시 출제. 맞히면 오답 해제 |
+| 추가 학습 | 다음 수업 준비 노트(써 볼 표현·물어볼 것), OPIc 모의 답변(질문·답변 구조·목표 표현·타이머), 주간 요약(PC에서 생성) |
+| 데이터 | 학습 기록 내보내기/가져오기(JSON), Anki TSV, 검색, 휴지통 |
+| 예비 입력 | PC를 쓸 수 없을 때 앱에서 직접 붙여넣기(기호 파싱 + AI 복사·붙여넣기) |
 
-## 주요 기능 (계획)
-**기본 복습 (AI 불필요, 오프라인)**
-- 표현 카드 영→한 / 한→영, 틀린 문장 직접 고치기, 빈칸 채우기, 객관식 — 간격반복(SM-2)
-- 녹음 구간 반복(A-B), 속도 조절, 쉐도잉(내 목소리 녹음 비교), 채팅 검색
-- 녹음 스크립트(STT)가 생기면 받아쓰기
+**백업을 없앤 이유(ADR 0007):** 수업 내용·녹음의 원본은 PC의 `private\archive`·패키지 ZIP이라 다시 가져오면 됩니다. 휴대폰에만 있는 것은 학습 기록뿐이라 그것만 내보냅니다.
 
-**AI 표현 업그레이드 (ADR 0003)**
-- 녹음 스크립트에서 OPIc IH 수준의 slang / idiom / 더 좋은 표현 **3개**를 설명·예시와 함께 제시
-- 같은 요청으로 기존 표현·교정의 **한국어 뜻을 자동 채움**(랭디 원본은 영어만 제공)
-- 연습 3종: ① 바꿔 말하기 드릴 ② 상황 → 표현 떠올리기 카드 ③ OPIc 미니 답변 챌린지
-- 연동 방식: 앱이 만든 프롬프트를 원하는 AI 채팅에 붙여넣고, 결과 JSON을 앱에 다시 붙여넣기(API 키·서버 불필요, 공급자 교체 자유)
-- 음성 파일은 AI에 보내지 않음. 보낼 텍스트는 미리보기·이름 마스킹 후 전송
+**v0.7 이하에서 업데이트하면:** 기존 수업·카드는 앱이 처음 열릴 때 자동으로 새 형식으로 바뀌고 복습 기록(간격)은 이어집니다. 기존 수업에는 스크립트·업그레이드가 없으므로, 같은 수업을 PC 처리기로 다시 만들면 내용이 채워집니다(수업 ID가 다르면 새 수업으로 추가됨).
 
-## 진행 방법
-Claude Code, Cowork 또는 다른 AI 코딩 도구에서 이 폴더를 열고 단계별로 지시합니다.
-1. (완료) `docs/prompts/01-plan.md` — 계획 수립
-2. `docs/prompts/02-to-08-next-steps.md`의 단계를 순서대로 하나씩 지시
-   - 02 합성 샘플 → 03 가져오기 → 04 복습 카드 → 05 오디오·채팅 → 06 오프라인·백업 → 06-1 STT → 07 AI 표현 업그레이드 → 08 이관 점검
-3. 배포: `docs/github-pages-guide.md` (가입 → 저장소 → 올리기 전 점검 → Pages 켜기 → Android 설치)
+## 이 폴더를 새 PC에 다시 받았을 때
+- GitHub Pages는 **GitHub 저장소에 올라간 코드로 동작**합니다. PC의 이 폴더는 코드를 고쳐 다시 올릴 때와 수업 처리기를 돌릴 때 필요합니다.
+- 코드 안 경로는 모두 상대 경로라 폴더 위치는 어디든 됩니다.
+- `.github/workflows/pages.yml`은 이미 저장소에 있습니다(사본: `docs/deploy/pages.yml`).
 
 ## 실행·테스트 (PC)
-- 테스트: `node --test tests/*.test.mjs`
-- 로컬 실행: `app` 폴더에서 `python -m http.server 8765` → 브라우저에서 http://localhost:8765
-- Android에서 쓰려면 GitHub Pages 배포가 필요합니다(06 단계, `docs/github-pages-guide.md`).
+- 앱 테스트: `node --test tests/*.test.mjs` (Node 20 이상, 외부 패키지 없음, 51개)
+- 처리기 테스트: `python -m unittest discover -s tools/tests -v` (14개, AI·음성 인식은 가짜로 대체)
+- 로컬 실행: `app` 폴더에서 `python -m http.server 8765` → http://localhost:8765
+
+## 업데이트 배포 방법
+1. GitHub 저장소 → **Code** 탭 → **Add file → Upload files**
+2. `app`, `docs`, `samples`, `schema`, `tests`, `tools`, `README.md`, `AGENTS.md`, `.gitignore` 를 끌어다 놓기
+   - **`private` 폴더, `tools\.env`, `tools\config.toml` 은 올리지 않음** (웹 업로드에는 `.gitignore`가 적용되지 않음)
+3. **Commit changes** → Actions 탭 초록 체크 확인 → 휴대폰 앱의 "새 버전" 배너에서 업데이트
+- 자세한 안내: `docs/github-pages-guide.md`
 
 ## 주의
-- `/init` 명령은 실행하지 마세요. 작성된 CLAUDE.md를 덮어쓸 수 있습니다.
-- 실제 수업 데이터(녹음·채팅·강사 이름)는 `/data` 또는 `/private`에만 두세요(.gitignore 처리됨). GitHub 웹 업로드 시에는 .gitignore가 적용되지 않으니 직접 확인하세요.
-- 다른 도구로 이관 시 AGENTS.md가 공통 규칙 파일입니다. CLAUDE.md는 이를 참조만 합니다.
+- 실제 수업 데이터(녹음·채팅·강사 이름)와 패키지 ZIP은 `private\`에만 두고 GitHub에 올리지 마세요.
+- AI 결과(교정·업그레이드·OPIc 수준 판단)는 정확성을 보장하지 않습니다. "AI 생성" 표시는 선생님 확인 전 내용입니다.
+- Claude API는 유료이며 사용량만큼 과금됩니다. 회사 PC라면 설치·외부 API 사용 전 사내 규정을 확인하세요.
 - 랭디 약관에서 녹음 파일의 저장·가공 허용 범위를 확인하세요.
-- OPIc IH 수준 판단은 AI의 일반 지식에 의존하며 공식 채점 기준과 일치를 보장하지 않습니다.
+- `/init` 명령은 실행하지 마세요(CLAUDE.md 덮어씀). 다른 AI 도구로 이관할 때 공통 규칙은 AGENTS.md입니다.
 
 ## 파일 구성
 | 파일 | 용도 |
 |---|---|
-| AGENTS.md | 도구 공통 프로젝트 규칙 |
-| CLAUDE.md | Claude Code용 진입점 (`@AGENTS.md`) |
-| .gitignore | 실제 수업 데이터·자격증명 커밋 방지 |
-| docs/plan.md | 구현 계획(아키텍처, 마일스톤, 위험, STT 비교, 확정 사항) |
-| docs/data-spec.md | 데이터 명세(수업·카드·AI 생성물·백업 구조) |
-| docs/decisions/ | 설계 결정 기록(ADR) — 0001 정적 PWA, 0002 AI 연동 방식, 0003 AI 표현 업그레이드, 0004 자체 ZIP 구현 |
-| docs/github-pages-guide.md | GitHub 가입·배포 안내 |
-| docs/sample-request.md | 익명화 샘플 준비 방법 |
-| docs/sample-analysis.md | 랭디 원본 형식 분석·변환 규칙·결정 사항 |
-| docs/prompts/01-plan.md | 첫 지시(계획 수립) |
-| docs/prompts/02-to-08-next-steps.md | 이후 단계별 지시 |
-| schema/*.json | 데이터 검증 규칙(JSON Schema) |
-| app/index.html, app/css, app/js | 앱 본체(가져오기·목록·상세·휴지통) |
-| app/js/parser/langdy-v1.js | 랭디 원본 → 표준 데이터 변환기 |
-| app/js/cards.js, app/js/srs.js | 복습 카드 생성·동기화, SM-2 간격반복, Anki TSV |
-| app/js/player.js, app/js/vtt.js | 녹음 플레이어·A-B 반복·구간 북마크(WebVTT)·쉐도잉 |
-| app/js/search.js | 수업 전체 검색 |
-| app/js/backup.js, app/js/zip.js, app/js/migrations.js | 백업 ZIP 만들기·복원(외부 라이브러리 없음, ADR 0004), 스키마 마이그레이션 |
-| app/sw.js, app/manifest.webmanifest, app/icons/ | 오프라인 캐시, 홈 화면 설치 정보·아이콘 |
-| docs/deploy/pages.yml | GitHub Pages 자동 배포 설정(저장소의 `.github/workflows/pages.yml`로 넣어야 함 — 안내서 4-1) |
-| app/prompts/expression-upgrade.md | AI 표현 업그레이드 + 한국어 뜻 채우기 프롬프트 템플릿 |
-| samples/ | 가상 샘플(원본 형식 + 변환 기대 결과) |
-| tests/ | 변환기·카드·간격반복·VTT·검색·ZIP·백업·서비스 워커 테스트 (37개) |
-| private/raw-samples/ | 익명화 샘플 넣는 곳(GitHub 업로드 제외) |
+| AGENTS.md / CLAUDE.md | AI 도구 공통 규칙 / Claude Code 진입점 |
+| app/index.html, css, js/main.js | 앱 화면 |
+| app/js/package.js | 수업 패키지 ZIP 읽기·검증(SHA-256·파일명·형식) |
+| app/js/cards.js, srs.js | 학습 항목 카드·문제 선택·채점, 간격반복(srs2) |
+| app/js/progress.js | 학습 기록 내보내기·합치기 |
+| app/js/migrations.js | 수업 데이터 v1 → v2 변환 |
+| app/js/player.js, vtt.js, search.js | 녹음 재생·시간 표기·검색 |
+| app/js/parser/, ai-structure.js, app/prompts/ | 예비 직접 입력(기호 파싱·AI 복사·붙여넣기) |
+| app/js/backup.js | 구버전 백업 형식(화면에서는 미사용, 테스트용으로 보존) |
+| app/sw.js, manifest.webmanifest, icons/ | 오프라인 캐시·홈 화면 설치 |
+| tools/ | PC 수업 처리기(Python): 음성 인식·AI 공급자·프롬프트·패키지 생성. 안내: tools/README.md |
+| schema/*.json | 데이터 형식(lesson v2, card v2, package, weekly, progress / v1 보존) |
+| docs/ | 계획, 데이터 명세, ADR 0001~0007, 배포 안내 |
+| samples/ | 가상 샘플(원본 형식·v1/v2 수업·주간 요약) |
+| tests/ | 앱 자동 테스트 |
+| private/ | 실제 수업 데이터(inbox·out·archive). GitHub 업로드 금지 |

@@ -1,7 +1,7 @@
 // IndexedDB 얇은 래퍼 (의존성 없음). 스토어 구조: docs/data-spec.md 6장
 
 const DB_NAME = 'english-review';
-const DB_VERSION = 3; // v2: cards, v3: bookmarks
+const DB_VERSION = 4; // v2: cards, v3: bookmarks(0.8.0부터 미사용, 보존), v4: summaries + cards.lessonId 색인
 let dbPromise = null;
 
 function open() {
@@ -13,13 +13,13 @@ function open() {
       if (!db.objectStoreNames.contains('lessons')) db.createObjectStore('lessons', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('audio')) db.createObjectStore('audio', { keyPath: 'lessonId' });
       if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta', { keyPath: 'key' });
-      if (!db.objectStoreNames.contains('cards')) {
-        const cs = db.createObjectStore('cards', { keyPath: 'id' });
-        cs.createIndex('lessonId', 'source.lessonId', { unique: false });
-      }
+      const cs = db.objectStoreNames.contains('cards') ? req.transaction.objectStore('cards') : db.createObjectStore('cards', { keyPath: 'id' });
+      if (cs.indexNames.contains('lessonId') && cs.index('lessonId').keyPath !== 'lessonId') cs.deleteIndex('lessonId');
+      if (!cs.indexNames.contains('lessonId')) cs.createIndex('lessonId', 'lessonId', { unique: false });
       if (!db.objectStoreNames.contains('bookmarks')) {
         db.createObjectStore('bookmarks', { keyPath: 'id' }).createIndex('lessonId', 'lessonId', { unique: false });
       }
+      if (!db.objectStoreNames.contains('summaries')) db.createObjectStore('summaries', { keyPath: 'id' });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -103,45 +103,30 @@ export async function cardsByLesson(lessonId) {
   return reqP(db.transaction('cards').objectStore('cards').index('lessonId').getAll(IDBKeyRange.only(lessonId)));
 }
 
-export async function listBookmarks(lessonId) {
+export async function deleteCards(ids) {
+  if (!ids.length) return;
   const db = await open();
-  return reqP(db.transaction('bookmarks').objectStore('bookmarks').index('lessonId').getAll(IDBKeyRange.only(lessonId)));
-}
-
-export async function putBookmark(b) {
-  const db = await open();
-  const tx = db.transaction('bookmarks', 'readwrite');
-  tx.objectStore('bookmarks').put(b);
+  const tx = db.transaction('cards', 'readwrite');
+  for (const id of ids) tx.objectStore('cards').delete(id);
   return done(tx);
 }
 
-export async function deleteBookmark(id) {
+export async function putSummary(w) {
   const db = await open();
-  const tx = db.transaction('bookmarks', 'readwrite');
-  tx.objectStore('bookmarks').delete(id);
+  const tx = db.transaction('summaries', 'readwrite');
+  tx.objectStore('summaries').put(w);
   return done(tx);
 }
 
-export async function listAllBookmarks() {
+export async function listSummaries() {
   const db = await open();
-  return reqP(db.transaction('bookmarks').objectStore('bookmarks').getAll());
+  return reqP(db.transaction('summaries').objectStore('summaries').getAll());
 }
 
-/**
- * 백업 복원: 수업 1건과 딸린 데이터를 한 트랜잭션으로 저장.
- * 기존 카드·북마크는 지우고 백업 것으로 교체. 백업에 녹음이 없으면 기기의 녹음은 유지.
- */
-export async function restoreLessonBundle(lesson, audio, cards, bookmarks) {
+export async function deleteSummary(id) {
   const db = await open();
-  const tx = db.transaction(['lessons', 'audio', 'cards', 'bookmarks'], 'readwrite');
-  tx.objectStore('lessons').put(lesson);
-  if (audio) tx.objectStore('audio').put({ lessonId: lesson.id, blob: audio.blob, mimeType: audio.mimeType });
-  for (const store of ['cards', 'bookmarks']) {
-    const os = tx.objectStore(store);
-    const items = store === 'cards' ? cards : bookmarks;
-    const req = os.index('lessonId').getAllKeys(IDBKeyRange.only(lesson.id));
-    req.onsuccess = () => { for (const k of req.result) os.delete(k); for (const it of items) os.put(it); };
-  }
+  const tx = db.transaction('summaries', 'readwrite');
+  tx.objectStore('summaries').delete(id);
   return done(tx);
 }
 

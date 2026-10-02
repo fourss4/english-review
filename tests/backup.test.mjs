@@ -8,7 +8,7 @@ import { syncLessonCards } from '../app/js/cards.js';
 
 const lesson = JSON.parse(readFileSync(new URL('../samples/normalized/les_20260101_01/lesson.json', import.meta.url), 'utf8'));
 const audio = new Blob([new Uint8Array(4096).map((_, i) => i % 251)], { type: 'audio/mp4' });
-const cards = syncLessonCards(lesson, [], '2026-10-02').upserts;
+const cards = syncLessonCards(lesson, [], '2026-10-02');
 const bookmarks = [{ id: 'bm_a1', lessonId: lesson.id, startSec: 1.5, endSec: 4, label: '연습 <구간> & 메모', createdAt: 'x' }];
 const make = (o = {}) => createBackup({ lessons: [lesson], audios: new Map([[lesson.id, { blob: audio, mimeType: 'audio/mp4' }]]), cards, bookmarks, appVersion: '0.6.0', ...o });
 

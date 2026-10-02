@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lesson-structure.schema.json",
+  "title": "LessonStructure (AI로 교정 찾기 결과, ADR 0005)",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "const": "lesson_structure"
+    },
+    "keyExpressions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "meaningKo": {
+            "type": "string"
+          },
+          "examples": {
+            "$ref": "#/$defs/examples"
+          }
+        }
+      }
+    },
+    "expressions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "partOfSpeech": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "meaningKo": {
+            "type": "string"
+          },
+          "examples": {
+            "$ref": "#/$defs/examples"
+          }
+        }
+      }
+    },
+    "corrections": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "original",
+          "corrected"
+        ],
+        "properties": {
+          "original": {
+            "type": "string"
+          },
+          "corrected": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "natural": {
+            "type": "string"
+          },
+          "naturalKo": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "examples": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "en"
+        ],
+        "properties": {
+          "en": {
+            "type": "string"
+          },
+          "ko": {
+            "type": "string"
+          },
+          "speaker": {
+            "type": "string",
+            "pattern": "^[A-Z]$"
+          }
+        }
+      }
+    }
+  }
+}

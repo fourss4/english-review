@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "progress.schema.json",
+  "title": "Learning progress export (학습 기록)",
+  "type": "object",
+  "required": [
+    "format",
+    "schemaVersion",
+    "exportedAt",
+    "cards"
+  ],
+  "properties": {
+    "format": {
+      "const": "english-review-progress"
+    },
+    "schemaVersion": {
+      "const": 2
+    },
+    "exportedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "appVersion": {
+      "type": "string"
+    },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "lessonId",
+          "ref",
+          "srs",
+          "log"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^crd_[A-Za-z0-9_]+$"
+          },
+          "lessonId": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "srs": {
+            "type": "object",
+            "required": [
+              "algorithm",
+              "ease",
+              "intervalDays",
+              "reps",
+              "due"
+            ],
+            "properties": {
+              "algorithm": {
+                "const": "srs2"
+              },
+              "ease": {
+                "type": "number"
+              },
+              "intervalDays": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "lapses": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "due": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "at",
+                "grade"
+              ],
+              "properties": {
+                "at": {
+                  "type": "string"
+                },
+                "grade": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "type": {
+                  "type": "string"
+                },
+                "correct": {
+                  "type": "boolean"
+                },
+                "mode": {
+                  "enum": [
+                    "normal",
+                    "wrong",
+                    "lesson"
+                  ]
+                }
+              }
+            }
+          },
+          "wrong": {
+            "type": "object",
+            "properties": {
+              "since": {
+                "type": "string"
+              },
+              "lastType": {
+                "type": "string"
+              }
+            }
+          },
+          "suspended": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

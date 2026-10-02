@@ -2,7 +2,7 @@
 
 ## 사용 환경 (확정)
 - Android Chrome, 홈화면 설치 PWA. GitHub Pages(공개 저장소)로 앱 코드만 배포
-- 입력: 녹음 mp4 파일 + 코멘트·채팅 텍스트 붙여넣기
+- 입력: PC 수업 처리기(`/tools`, Python)가 녹음 mp4 + 채팅·코멘트 텍스트를 처리해 만든 수업 패키지 ZIP(ADR 0006). 앱에서 직접 붙여넣기는 예비 경로
 
 ## 목적
 외부 영어회화 앱(랭디)의 수업 녹음·코멘트·채팅 이력을 가져와 복습/추가 학습하는
@@ -17,8 +17,9 @@
    `schemaVersion` 필드 필수, 마이그레이션 함수 유지.
 4. 의존성 최소화: 바닐라 JS/TS 또는 경량 라이브러리만. 새 의존성은 존재·라이선스·취약점 확인 후
    `/docs/decisions/`(ADR)에 사유 기록.
-5. 앱 본체는 LLM/STT API를 직접 호출하지 않는다. AI 표현 업그레이드(ADR 0003)는 "프롬프트 복사 → 결과 JSON 붙여넣기"(ADR 0002),
-   대량 생성·STT는 선택형 CLI(`/tools`)로만 구현. API 키 하드코딩 금지, 환경변수 사용. 공급자는 인터페이스 뒤에 숨김.
+5. 앱 본체는 LLM/STT API를 직접 호출하지 않는다. STT·AI 추출은 PC 수업 처리기(`/tools`)에서만 수행(ADR 0006).
+   녹음은 PC 밖으로 보내지 않고, AI에는 이름·연락처를 가린 텍스트만 보낸다. API 키는 `tools/.env`(환경변수)에만, 하드코딩 금지.
+   공급자는 `complete(system, user, step) -> str` 인터페이스 뒤에 숨긴다(`tools/processor/llm/`). 프롬프트는 `tools/prompts/*.md`.
 6. 개인정보: 강사 실명·음성·채팅은 개인정보. 저장소에 실제 수업 데이터 커밋 금지(`.gitignore`),
    테스트는 `/samples`의 가상 데이터만 사용. 로그에 수업 내용 출력 금지.
 7. 입력 포맷 가정 금지: 원본 파일 구조는 사용자가 제공하는 (익명화된) 샘플을 먼저 분석한 뒤 파서를 작성한다.
@@ -28,8 +29,8 @@
 - `/schema` JSON Schema
 - `/docs` data-spec.md, decisions/(ADR), prompts/(작업 지시 이력)
 - `/samples` 가상(합성) 샘플 데이터만
-- `/tools` 선택형 CLI (LLM 콘텐츠 생성 등)
-- `/data`, `/private` 실제 수업 데이터 위치(커밋 금지)
+- `/tools` PC 수업 처리기(Python): STT·AI 공급자·프롬프트·패키지 생성. 설정 `tools/config.toml`, 키 `tools/.env`(둘 다 커밋 금지)
+- `/data`, `/private` 실제 수업 데이터 위치(커밋 금지). 처리기 입출력: `private/inbox`, `private/out`, `private/work`, `private/archive`
 
 ## 작업 방식
 - 큰 작업은 Plan 모드로 계획 → 승인 후 구현. 단계마다 테스트와 README 갱신.
@@ -39,7 +40,9 @@
 - 모호한 점은 한 번에 모아서 질문한다.
 
 ## 실행·테스트
-- 테스트: `node --test tests/*.test.mjs` (Node 20 이상, 외부 패키지 없음)
+- 앱 테스트: `node --test tests/*.test.mjs` (Node 20 이상, 외부 패키지 없음)
+- 처리기 테스트: `python -m unittest discover -s tools/tests -v` (AI·STT는 mock)
+- 구버전 파일(backup.js, ai-structure.js 등)은 웹 업로드 환경에서 삭제가 번거로워 보존한다. 화면에서 쓰지 않아도 ASSETS·테스트는 유지
 - 로컬 실행: `app` 폴더에서 `python -m http.server 8765` → http://localhost:8765 (서비스 워커는 localhost/https에서만 동작)
 - 배포: `.github/workflows/pages.yml`(원본 사본: `docs/deploy/pages.yml`) — main 브랜치 push 시 테스트 후 `app/`만 GitHub Pages로 배포. 배포 실행은 사람이 한다
 - 앱 파일을 추가·삭제하면 `app/sw.js`의 ASSETS와 VERSION, `app/js/version.js`를 함께 갱신(테스트가 검사)

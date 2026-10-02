@@ -1,4 +1,4 @@
-// 수업 전체 검색 (표현·교정·총평·채팅 원문). DOM 비의존.
+// 수업 전체 검색 (표현·교정·업그레이드·스크립트·채팅 원문). v1·v2 수업 모두 지원. DOM 비의존.
 import { normalizeText } from './text.js';
 
 const norm = (s) => normalizeText(s).toLowerCase();
@@ -9,17 +9,23 @@ export function searchableFields(lesson) {
   const add = (label, text, itemId) => { if (text && String(text).trim()) f.push({ label, text: String(text), itemId }); };
   add('제목', [lesson.course, lesson.title].filter(Boolean).join(' · '));
   for (const e of lesson.expressions || []) {
-    add(e.isKey ? '핵심 표현' : '표현', [e.text, e.meaning, e.pattern, e.definition].filter(Boolean).join(' — '), e.id);
+    add(e.isKey ? '핵심 표현' : '표현', [e.text, e.meaningKo || e.meaning, e.pattern, e.definition].filter(Boolean).join(' — '), e.id);
     for (const x of e.examples || []) add('예문', [x.en, x.ko].filter(Boolean).join(' — '), e.id);
   }
   for (const c of lesson.corrections || []) {
     add('틀린 문장', c.original, c.id);
     add('교정', c.corrected, c.id);
     add('더 자연스러운 표현', c.natural, c.id);
-    add('이유', c.explanation, c.id);
+    add('이유', c.explanationKo || c.explanation, c.id);
     add('해설', c.explanationLong, c.id);
   }
+  for (const u of lesson.upgrades || []) {
+    add('표현 업그레이드', [u.suggestion, u.meaningKo].filter(Boolean).join(' — '), u.id);
+    add('내가 한 말', u.original, u.id);
+    for (const x of u.examples || []) add('예문', [x.en, x.ko].filter(Boolean).join(' — '), u.id);
+  }
   add('강사 총평', lesson.feedback?.summary);
+  for (const sg of lesson.transcript?.segments || []) add('스크립트', sg.text);
   for (const line of (lesson.source?.raw?.chat || '').split(/\r?\n/)) add('채팅 원문', line);
   return f;
 }

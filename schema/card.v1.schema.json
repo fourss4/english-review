@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "card.schema.json",
+  "title": "CardCollection",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "cards"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "direction",
+          "front",
+          "back",
+          "srs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^crd_[A-Za-z0-9_]+$"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "enum": [
+                  "expression",
+                  "correction",
+                  "generated",
+                  "manual"
+                ]
+              },
+              "lessonId": {
+                "type": "string"
+              },
+              "itemId": {
+                "type": "string"
+              }
+            }
+          },
+          "direction": {
+            "enum": [
+              "en2ko",
+              "ko2en",
+              "en2def",
+              "cloze",
+              "fix"
+            ]
+          },
+          "front": {
+            "type": "string",
+            "minLength": 1
+          },
+          "back": {
+            "type": "string"
+          },
+          "srs": {
+            "type": "object",
+            "required": [
+              "algorithm",
+              "ease",
+              "intervalDays",
+              "reps",
+              "due"
+            ],
+            "properties": {
+              "algorithm": {
+                "const": "sm2"
+              },
+              "ease": {
+                "type": "number",
+                "minimum": 1.3
+              },
+              "intervalDays": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reps": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "due": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "suspended": {
+            "type": "boolean"
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "at",
+                "grade"
+              ],
+              "properties": {
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "grade": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5
+                }
+              }
+            }
+          },
+          "answer": {
+            "type": "string",
+            "description": "입력형 카드(cloze, fix)의 채점 기준"
+          },
+          "altAnswer": {
+            "type": "string",
+            "description": "fix 카드의 대체 정답(더 자연스러운 표현)"
+          },
+          "suspendedReason": {
+            "enum": [
+              "removed"
+            ],
+            "description": "원본 항목이 수업에서 삭제되어 자동 보류됨"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

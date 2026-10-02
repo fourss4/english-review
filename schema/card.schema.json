@@ -1,143 +1,106 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "card.schema.json",
-  "title": "CardCollection",
+  "title": "Card v2 (항목 1개 = 카드 1장, 문제 유형은 lesson.exercises에서 회전)",
   "type": "object",
   "required": [
-    "schemaVersion",
-    "cards"
+    "id",
+    "lessonId",
+    "ref",
+    "srs",
+    "log"
   ],
   "properties": {
-    "schemaVersion": {
-      "const": 1
+    "id": {
+      "type": "string",
+      "pattern": "^crd_[A-Za-z0-9_]+$"
     },
-    "cards": {
+    "lessonId": {
+      "type": "string"
+    },
+    "ref": {
+      "type": "string"
+    },
+    "srs": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "ease",
+        "intervalDays",
+        "reps",
+        "due"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "srs2"
+        },
+        "ease": {
+          "type": "number"
+        },
+        "intervalDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lapses": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "due": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "log": {
       "type": "array",
       "items": {
         "type": "object",
         "required": [
-          "id",
-          "source",
-          "direction",
-          "front",
-          "back",
-          "srs"
+          "at",
+          "grade"
         ],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^crd_[A-Za-z0-9_]+$"
-          },
-          "source": {
-            "type": "object",
-            "required": [
-              "type"
-            ],
-            "properties": {
-              "type": {
-                "enum": [
-                  "expression",
-                  "correction",
-                  "generated",
-                  "manual"
-                ]
-              },
-              "lessonId": {
-                "type": "string"
-              },
-              "itemId": {
-                "type": "string"
-              }
-            }
-          },
-          "direction": {
-            "enum": [
-              "en2ko",
-              "ko2en",
-              "en2def",
-              "cloze",
-              "fix"
-            ]
-          },
-          "front": {
-            "type": "string",
-            "minLength": 1
-          },
-          "back": {
+          "at": {
             "type": "string"
           },
-          "srs": {
-            "type": "object",
-            "required": [
-              "algorithm",
-              "ease",
-              "intervalDays",
-              "reps",
-              "due"
-            ],
-            "properties": {
-              "algorithm": {
-                "const": "sm2"
-              },
-              "ease": {
-                "type": "number",
-                "minimum": 1.3
-              },
-              "intervalDays": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "reps": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "due": {
-                "type": "string",
-                "format": "date"
-              }
-            }
+          "grade": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
           },
-          "suspended": {
+          "type": {
+            "type": "string"
+          },
+          "correct": {
             "type": "boolean"
           },
-          "log": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": [
-                "at",
-                "grade"
-              ],
-              "properties": {
-                "at": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "grade": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 5
-                }
-              }
-            }
-          },
-          "answer": {
-            "type": "string",
-            "description": "입력형 카드(cloze, fix)의 채점 기준"
-          },
-          "altAnswer": {
-            "type": "string",
-            "description": "fix 카드의 대체 정답(더 자연스러운 표현)"
-          },
-          "suspendedReason": {
+          "mode": {
             "enum": [
-              "removed"
-            ],
-            "description": "원본 항목이 수업에서 삭제되어 자동 보류됨"
+              "normal",
+              "wrong",
+              "lesson"
+            ]
           }
         }
       }
+    },
+    "wrong": {
+      "type": "object",
+      "properties": {
+        "since": {
+          "type": "string"
+        },
+        "lastType": {
+          "type": "string"
+        }
+      }
+    },
+    "suspended": {
+      "type": "boolean"
     }
-  },
-  "additionalProperties": true
+  }
 }

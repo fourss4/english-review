@@ -1,0 +1,19 @@
+Here is the JSON:
+```json
+{
+  "schemaVersion": 1,
+  "kind": "lesson_structure",
+  "keyExpressions": [
+    { "text": "It's up to you", "meaningKo": "너에게 달려 있어 / 네가 정해",
+      "examples": [ { "speaker": "A", "en": "Where should we eat?", "ko": "어디서 먹을까?" }, { "speaker": "B", "en": "It's up to you.", "ko": "너 좋을 대로 해." } ] }
+  ],
+  "expressions": [
+    { "text": "bored vs boring", "definition": "bored = how you feel; boring = makes others feel bored", "meaningKo": "지루함을 느끼는 / 지루하게 만드는" }
+  ],
+  "corrections": [
+    { "original": "I will decide by you", "corrected": "I'll leave it up to you.", "explanation": "\"decide by you\" is not natural; we say \"leave it up to you\".", "naturalKo": "너에게 맡길게." },
+    { "original": "I am boring on weekends", "corrected": "I am bored on weekends", "explanation": "boring = makes others feel bored / bored = how you feel", "natural": "I get bored on weekends", "naturalKo": "나는 주말에 지루해진다." },
+    { "original": "", "corrected": "should be dropped" }
+  ]
+}
+```

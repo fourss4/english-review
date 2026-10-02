@@ -1,9 +1,13 @@
 // 전체 백업 ZIP 만들기·읽기 (구조: docs/data-spec.md 5장). DOM·IndexedDB 비의존 → Node 테스트 가능
 import { writeZip, readZip, sha256Hex } from './zip.js';
 import { bookmarksToVtt, parseVtt } from './vtt.js';
-import { toAnkiTsv } from './cards.js';
 import { validateLesson } from './parser/langdy-v1.js';
-import { migrate, CURRENT_SCHEMA } from './migrations.js';
+// v0.8.0부터 화면에서 쓰지 않는 구버전(v1) 백업 모듈. 테스트·참고용으로 형식을 고정해 둔다(ADR 0007).
+const CURRENT_SCHEMA = 1;
+const migrate = (_kind, obj) => obj;
+
+const cell = (x) => String(x ?? '').replace(/\t/g, ' ').replace(/\r?\n/g, ' / ').trim();
+const legacyTsv = (cards) => ['#separator:tab', '#html:false', ...cards.map((c) => [cell(c.front ?? c.ref), cell(c.back ?? '')].join('\t'))].join('\n') + '\n';
 
 export const BACKUP_FORMAT = 'english-review-backup';
 const LIMITS = { entries: 5000, entryBytes: 300 * 1024 * 1024, jsonBytes: 5 * 1024 * 1024, totalBytes: 4 * 1024 ** 3 - 1 };
@@ -45,7 +49,7 @@ export async function createBackup({ lessons, audios, cards, bookmarks, includeA
     if (bms.length) add(`lessons/${l.id}/bookmarks.vtt`, bookmarksToVtt(bms));
   }
   add('review/cards.json', jsonText({ schemaVersion: CURRENT_SCHEMA, cards }));
-  add('review/cards-anki.tsv', toAnkiTsv(cards.filter((c) => !c.suspended)));
+  add('review/cards-anki.tsv', legacyTsv(cards.filter((c) => !c.suspended)));
 
   const list = [];
   for (const f of files) list.push({ path: f.name, bytes: f.data.size, sha256: await sha256Hex(f.data) });
@@ -159,7 +163,7 @@ export async function readBackup(file) {
     const cj = migrate('cards', await readJson(ce), manifest.schemaVersion);
     if (!Array.isArray(cj.cards)) throw new BackupError('cards.json 형식이 올바르지 않습니다.');
     const ids = new Set(lessons.map((l) => l.id));
-    cards = cj.cards.filter((c) => c && /^crd_[A-Za-z0-9_]+$/.test(c.id) && c.srs && ids.has(c.source?.lessonId));
+    cards = cj.cards.filter((c) => c && /^crd_[A-Za-z0-9_]+$/.test(c.id) && c.srs && ids.has(c.lessonId ?? c.source?.lessonId));
     if (cards.length !== cj.cards.length) warnings.push(`카드 ${cj.cards.length - cards.length}장은 연결된 수업이 없어 건너뜀`);
   }
   return { manifest, lessons, audios, cards, bookmarks, warnings };

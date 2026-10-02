@@ -1,0 +1,342 @@
+{
+ "schemaVersion": 2,
+ "id": "les_20260928_01",
+ "date": "2026-09-28T00:00:00+09:00",
+ "course": "한국적 사고 버리기",
+ "lessonNo": 1,
+ "title": "저 신경 쓰지 마세요",
+ "corrections": [
+  {
+   "original": "It's so natural in our culture to ask age to other people.",
+   "corrected": "It's so natural in our culture to ask other people's age.",
+   "natural": "In our culture, it's very common to ask people how old they are.",
+   "explanationKo": "ask 뒤에 사람의 나이를 목적어로 씁니다.",
+   "meaningKo": "우리 문화에서는 다른 사람의 나이를 묻는 것이 자연스럽다.",
+   "source": "chat",
+   "id": "cor_01"
+  },
+  {
+   "original": "I am boring on weekends",
+   "corrected": "I am bored on weekends.",
+   "natural": "I get bored on weekends.",
+   "explanationKo": "내가 지루함을 느낄 때는 bored를 씁니다.",
+   "meaningKo": "나는 주말에 심심하다.",
+   "source": "transcript",
+   "offsetSec": 312.4,
+   "ai": {
+    "corrected": true,
+    "natural": true
+   },
+   "id": "cor_02"
+  }
+ ],
+ "expressions": [
+  {
+   "text": "Don't mind me",
+   "isKey": true,
+   "pattern": "mind + A",
+   "meaningKo": "저 신경 쓰지 마세요",
+   "examples": [
+    {
+     "en": "Feel free to use the kitchen. Don't mind me.",
+     "ko": "부엌 편하게 쓰세요. 저는 신경 쓰지 마세요."
+    }
+   ],
+   "source": "chat",
+   "id": "exp_01"
+  },
+  {
+   "text": "raise (your) voice",
+   "definition": "to speak louder than normal",
+   "meaningKo": "언성을 높이다",
+   "examples": [
+    {
+     "en": "People raise their voices when they are upset."
+    }
+   ],
+   "source": "comment",
+   "id": "exp_02"
+  }
+ ],
+ "upgrades": [
+  {
+   "original": "I was very tired so I stopped working.",
+   "suggestion": "I was so beat that I called it a day.",
+   "meaningKo": "너무 지쳐서 그만 마무리했다",
+   "explanationKo": "call it a day는 일을 마무리할 때 쓰는 관용구입니다.",
+   "category": "idiom",
+   "register": "casual",
+   "offsetSec": 605.0,
+   "examples": [
+    {
+     "en": "Let's call it a day.",
+     "ko": "오늘은 여기까지 하자."
+    },
+    {
+     "en": "After the hike, I called it a day.",
+     "ko": "등산 후 하루를 마무리했다."
+    }
+   ],
+   "situationKo": "피곤해서 그만하자고 할 때",
+   "opicQuestion": "Tell me about a tiring day you had recently.",
+   "id": "up_01"
+  },
+  {
+   "original": "It was very fun.",
+   "suggestion": "It was a blast.",
+   "meaningKo": "정말 재미있었다",
+   "explanationKo": "a blast는 아주 즐거운 경험을 말할 때 씁니다.",
+   "category": "slang",
+   "register": "casual",
+   "examples": [
+    {
+     "en": "The party was a blast.",
+     "ko": "파티 정말 재밌었어."
+    }
+   ],
+   "situationKo": "즐거웠던 경험을 말할 때",
+   "opicQuestion": "Describe a memorable trip.",
+   "id": "up_02"
+  },
+  {
+   "original": "I don't know well about it.",
+   "suggestion": "I'm not really familiar with it.",
+   "meaningKo": "잘 알지 못한다",
+   "explanationKo": "know well about은 어색합니다.",
+   "category": "better_expression",
+   "register": "neutral",
+   "examples": [
+    {
+     "en": "I'm not really familiar with that area.",
+     "ko": "그 지역은 잘 몰라요."
+    }
+   ],
+   "situationKo": "잘 모르는 주제가 나왔을 때",
+   "opicQuestion": "Tell me about a place you have never been to.",
+   "id": "up_03"
+  }
+ ],
+ "exercises": [
+  {
+   "ref": "cor_01",
+   "type": "choice",
+   "prompt": "가장 자연스러운 문장은?",
+   "answer": "It's natural to ask other people's age.",
+   "options": [
+    "It's natural to ask age to other people.",
+    "It's natural to ask other people's age.",
+    "It's natural to ask other people age."
+   ],
+   "explanationKo": "ask + 사람의 나이",
+   "id": "ex_cor_01_1"
+  },
+  {
+   "ref": "cor_01",
+   "type": "cloze",
+   "prompt": "In our culture, it's common to ask _____ age.",
+   "answer": "other people's",
+   "accept": [
+    "others'"
+   ],
+   "promptKo": "우리 문화에서는 다른 사람의 나이를 묻는 것이 흔하다.",
+   "id": "ex_cor_01_2"
+  },
+  {
+   "ref": "cor_02",
+   "type": "cloze",
+   "prompt": "I get _____ on weekends.",
+   "answer": "bored",
+   "id": "ex_cor_02_1"
+  },
+  {
+   "ref": "cor_02",
+   "type": "choice",
+   "prompt": "Pick the correct one.",
+   "answer": "I am bored on weekends.",
+   "options": [
+    "I am boring on weekends.",
+    "I am bored on weekends."
+   ],
+   "id": "ex_cor_02_2"
+  },
+  {
+   "ref": "exp_01",
+   "type": "cloze",
+   "prompt": "Feel free to use the kitchen. _____.",
+   "answer": "Don't mind me",
+   "id": "ex_exp_01_1"
+  },
+  {
+   "ref": "exp_01",
+   "type": "meaning",
+   "prompt": "Don't mind me",
+   "answer": "저 신경 쓰지 마세요 — 상대가 나 때문에 불편해하지 않게 할 때",
+   "id": "ex_exp_01_2"
+  },
+  {
+   "ref": "exp_02",
+   "type": "meaning",
+   "prompt": "raise (your) voice",
+   "answer": "언성을 높이다",
+   "id": "ex_exp_02_1"
+  },
+  {
+   "ref": "exp_02",
+   "type": "situation",
+   "prompt": "Which expression fits?",
+   "answer": "raise their voices",
+   "options": [
+    "raise their voices",
+    "rise their voices",
+    "lift their voices"
+   ],
+   "promptKo": "화가 나서 큰 소리로 말하는 사람을 묘사할 때",
+   "id": "ex_exp_02_2"
+  },
+  {
+   "ref": "up_01",
+   "type": "situation",
+   "prompt": "Which expression fits?",
+   "answer": "Let's call it a day.",
+   "options": [
+    "Let's call it a day.",
+    "Let's call it a night off.",
+    "Let's day it."
+   ],
+   "promptKo": "너무 피곤해서 오늘 일을 그만하자고 할 때",
+   "id": "ex_up_01_1"
+  },
+  {
+   "ref": "up_01",
+   "type": "cloze",
+   "prompt": "I was so beat that I _____.",
+   "answer": "called it a day",
+   "id": "ex_up_01_2"
+  },
+  {
+   "ref": "up_02",
+   "type": "meaning",
+   "prompt": "It was a blast.",
+   "answer": "정말 재미있었다",
+   "id": "ex_up_02_1"
+  },
+  {
+   "ref": "up_03",
+   "type": "situation",
+   "prompt": "Which expression fits?",
+   "answer": "I'm not really familiar with it.",
+   "options": [
+    "I'm not really familiar with it.",
+    "I don't know well about it."
+   ],
+   "promptKo": "잘 모르는 주제가 나왔을 때",
+   "id": "ex_up_03_1"
+  },
+  {
+   "ref": "up_03",
+   "type": "cloze",
+   "prompt": "I'm not really _____ with that area.",
+   "answer": "familiar",
+   "id": "ex_up_03_2"
+  }
+ ],
+ "prep": {
+  "expressions": [
+   {
+    "text": "call it a day",
+    "howToUseKo": "수업 끝날 때 써 보세요",
+    "ref": "up_01"
+   },
+   {
+    "text": "It was a blast",
+    "howToUseKo": "주말 이야기할 때",
+    "ref": "up_02"
+   },
+   {
+    "text": "Don't mind me",
+    "howToUseKo": "양해 구할 때",
+    "ref": "exp_01"
+   }
+  ],
+  "questions": [
+   "What do you usually do when you feel bored?",
+   "Is it rude to ask someone's age in your country?",
+   "How do you deal with stress?"
+  ]
+ },
+ "opic": [
+  {
+   "question": "Tell me about a time you felt exhausted after a long day.",
+   "questionKo": "긴 하루 끝에 지쳤던 경험",
+   "structureKo": [
+    "상황 소개",
+    "무엇을 했는지",
+    "느낀 점"
+   ],
+   "targetRefs": [
+    "up_01",
+    "up_02"
+   ],
+   "seconds": 90,
+   "id": "opic_01"
+  },
+  {
+   "question": "Describe a cultural difference you noticed.",
+   "structureKo": [
+    "도입",
+    "예시",
+    "마무리"
+   ],
+   "targetRefs": [
+    "cor_01"
+   ],
+   "seconds": 90,
+   "id": "opic_02"
+  }
+ ],
+ "source": {
+  "app": "langdy",
+  "importedAt": "2026-10-02T12:00:00Z",
+  "generator": {
+   "tool": "langdy-processor",
+   "version": "1.0.0",
+   "stt": "faster-whisper fake",
+   "llm": {
+    "provider": "mock",
+    "model": "mock-1"
+   }
+  },
+  "raw": {
+   "chat": "❌: It's so natural in our culture to ask age to other people.\n✅: ...\n(데모 채팅)",
+   "comment": "Your sentences show a strong abilitv."
+  }
+ },
+ "audio": {
+  "file": "audio.mp4",
+  "mimeType": "audio/mp4",
+  "originalFileName": "lesson1_260928_한국적 사고 버리기 - 1 저 신경 쓰지 마세요.m4a.mp4",
+  "durationSec": 1300.46
+ },
+ "durationSec": 1300.46,
+ "transcript": {
+  "generator": "faster-whisper fake",
+  "language": "en",
+  "segments": [
+   {
+    "start": 1.0,
+    "end": 3.5,
+    "text": "Hi Jenny, nice to see you."
+   },
+   {
+    "start": 312.4,
+    "end": 315.0,
+    "text": "I am boring on weekends."
+   },
+   {
+    "start": 605.0,
+    "end": 609.0,
+    "text": "I was very tired so I stopped working."
+   }
+  ]
+ }
+}

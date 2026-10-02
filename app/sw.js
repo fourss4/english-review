@@ -1,6 +1,6 @@
 // 서비스 워커: 앱 파일을 기기에 저장해 오프라인에서도 실행. 사용자 데이터는 다루지 않음(IndexedDB에 있음).
 // 파일을 추가·삭제하면 ASSETS를 갱신하고 VERSION을 올린다(tests/sw.test.mjs가 누락을 검사).
-const VERSION = '0.6.0';
+const VERSION = '0.8.0';
 const CACHE = `english-review-${VERSION}`;
 const ASSETS = [
   './',
@@ -17,10 +17,14 @@ const ASSETS = [
   './js/vtt.js',
   './js/search.js',
   './js/zip.js',
+  './js/package.js',
+  './js/progress.js',
   './js/backup.js',
   './js/migrations.js',
+  './js/ai-structure.js',
   './js/parser/langdy-v1.js',
   './prompts/expression-upgrade.md',
+  './prompts/chat-structure.md',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',

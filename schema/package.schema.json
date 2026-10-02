@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "package.schema.json",
+  "title": "Package manifest (수업 패키지·주간 요약)",
+  "type": "object",
+  "required": [
+    "format",
+    "schemaVersion",
+    "kind",
+    "createdAt",
+    "files"
+  ],
+  "properties": {
+    "format": {
+      "const": "english-review-package"
+    },
+    "schemaVersion": {
+      "const": 2
+    },
+    "kind": {
+      "enum": [
+        "lesson",
+        "weekly"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generator": {
+      "type": "object"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

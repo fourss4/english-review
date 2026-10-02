@@ -28,55 +28,58 @@
   <main>
     <!-- 복습 -->
     <section id="view-review" class="view">
-      <div id="bk-remind" class="warn" hidden>
-        <span id="bk-remind-text"></span>
-        <button type="button" id="bk-remind-go" class="link">백업하러 가기</button>
-      </div>
       <div id="rv-home">
         <div class="stats">
           <div><strong id="rv-due">0</strong><span>복습 예정</span></div>
-          <div><strong id="rv-new">0</strong><span>새 카드</span></div>
-          <div><strong id="rv-total">0</strong><span>전체 카드</span></div>
+          <div><strong id="rv-new">0</strong><span>새 항목</span></div>
+          <div><strong id="rv-wrongn">0</strong><span>오답</span></div>
         </div>
         <button type="button" id="rv-start" class="primary wide">오늘 복습 시작</button>
+        <button type="button" id="rv-wrong" class="wide">오답만 다른 유형으로 다시 풀기</button>
         <p id="rv-note" class="muted"></p>
+        <div id="rv-prep"></div>
         <details>
-          <summary>설정 · 내보내기</summary>
-          <label>하루 새 카드 수
+          <summary>복습 설정</summary>
+          <label>하루 새 항목 수
             <input type="number" id="rv-newlimit" min="0" max="200" step="1">
           </label>
-          <button type="button" id="rv-export">Anki용 TSV 내보내기</button>
+          <p class="muted">처음 맞히면 어려움 1일 · 보통 3일 · 쉬움 5일 뒤에 다시 나오고, 맞힐수록 간격이 길어집니다. 틀리면 오늘 다시 나옵니다.</p>
         </details>
       </div>
       <div id="rv-session" hidden>
         <div class="row-between"><span id="rv-progress" class="muted"></span><button type="button" id="rv-quit" class="link">그만하기</button></div>
         <div class="flash">
           <div id="rv-kind" class="muted"></div>
+          <div id="rv-ko" class="situation" hidden></div>
           <div id="rv-front" class="front"></div>
+          <div id="rv-options" class="options" hidden></div>
           <div id="rv-input-wrap" hidden>
-            <textarea id="rv-input" rows="3" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>
+            <input type="text" id="rv-input" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="빈칸에 들어갈 표현">
             <button type="button" id="rv-check" class="primary wide">확인</button>
           </div>
-          <button type="button" id="rv-show" class="primary wide">정답 보기</button>
-          <div id="rv-result" hidden></div>
+          <button type="button" id="rv-show" class="primary wide" hidden>정답 보기</button>
+          <div id="rv-result" class="result" hidden></div>
           <div id="rv-back" class="back" hidden></div>
+          <div id="rv-actions" class="row" hidden></div>
         </div>
         <div id="rv-grades" class="grades" hidden></div>
       </div>
       <div id="rv-done" hidden>
         <h2>복습 완료</h2>
         <p id="rv-done-msg"></p>
-        <button type="button" id="rv-done-home" class="primary">처음으로</button>
+        <button type="button" id="rv-done-wrong" class="wide" hidden>틀린 항목 다른 유형으로 다시 풀기</button>
+        <button type="button" id="rv-done-home" class="primary wide">처음으로</button>
       </div>
     </section>
 
     <!-- 수업 목록 -->
     <section id="view-list" class="view" hidden>
-      <input type="search" id="q" placeholder="표현·교정·채팅 검색 (2글자 이상)" aria-label="수업 검색" autocomplete="off">
+      <input type="search" id="q" placeholder="표현·교정·스크립트 검색 (2글자 이상)" aria-label="수업 검색" autocomplete="off">
       <div id="q-results" hidden></div>
-      <p id="storage" class="muted"></p>
+      <div id="weeklies"></div>
       <ul id="lessons" class="cards"></ul>
-      <p id="empty" class="muted" hidden>아직 가져온 수업이 없습니다. "가져오기"에서 시작하세요.</p>
+      <p id="empty" class="muted" hidden>아직 가져온 수업이 없습니다. "가져오기"에서 수업 패키지를 선택하세요.</p>
+      <p id="storage" class="muted"></p>
     </section>
 
     <!-- 수업 상세 -->
@@ -91,89 +94,103 @@
           <button type="button" id="p-fwd">+5초</button>
           <span id="p-speeds" class="seg"></span>
         </div>
-        <div class="prow">
-          <button type="button" id="p-a">A 시작</button>
-          <button type="button" id="p-b">B 끝</button>
-          <button type="button" id="p-clear">반복 해제</button>
-        </div>
-        <p id="p-status" class="muted" aria-live="polite"></p>
-        <div class="prow">
-          <input type="text" id="p-label" maxlength="200" placeholder="구간 메모 (선택)">
-          <button type="button" id="p-save" disabled>구간 저장</button>
-        </div>
-        <div class="prow">
-          <button type="button" id="p-rec">● 내 목소리 녹음</button>
-          <button type="button" id="p-compare" disabled>원본 → 내 녹음 듣기</button>
-        </div>
-        <p id="p-rec-msg" class="muted"></p>
-        <audio id="p-mine" controls hidden></audio>
-        <h4>저장한 구간</h4>
-        <ul id="p-bookmarks" class="bms"></ul>
-        <button type="button" id="p-vtt" disabled>구간 VTT 내보내기</button>
       </div>
-      <button type="button" id="d-review" class="primary wide">이 수업 카드 복습</button>
+      <button type="button" id="d-review" class="primary wide">이 수업 복습</button>
       <div id="d-body"></div>
+      <details id="d-tr-wrap" hidden>
+        <summary id="d-tr-sum">스크립트</summary>
+        <p class="muted">줄을 누르면 그 위치부터 재생합니다. 자동 변환이라 틀린 부분이 있을 수 있습니다.</p>
+        <ol id="d-tr" class="transcript"></ol>
+      </details>
       <details id="d-chat-wrap" hidden>
-        <summary>채팅 원문 보기</summary>
+        <summary>채팅 원문</summary>
         <pre id="d-chat" class="raw"></pre>
+      </details>
+      <details id="d-comment-wrap" hidden>
+        <summary>코멘트 원문</summary>
+        <pre id="d-comment" class="raw"></pre>
       </details>
       <button type="button" id="d-delete" class="danger">휴지통으로 이동</button>
     </section>
 
     <!-- 가져오기 -->
     <section id="view-import" class="view" hidden>
-      <form id="import-form" autocomplete="off">
-        <label>녹음 파일 (mp4 / m4a)
-          <input type="file" id="f-audio" accept=".mp4,.m4a,audio/mp4,video/mp4">
-        </label>
-        <p id="f-audio-info" class="muted"></p>
-        <label>채팅 (복사해서 붙여넣기)
-          <textarea id="f-chat" rows="6" placeholder="❌: ... / ✅: ... / 💡: ..."></textarea>
-        </label>
-        <label>코멘트 (복사해서 붙여넣기)
-          <textarea id="f-comment" rows="6"></textarea>
-        </label>
-        <label>수업 날짜
-          <input type="date" id="f-date">
-        </label>
-        <button type="submit" class="primary">변환 미리보기</button>
-      </form>
+      <h2>수업 패키지 가져오기</h2>
+      <p class="muted">PC의 수업 처리기가 만든 <b>lesson-….zip</b>(수업) 또는 <b>weekly-….zip</b>(주간 요약)을 선택하세요. 여러 개를 한 번에 고를 수 있습니다.</p>
+      <label>패키지 ZIP 선택
+        <input type="file" id="pk-file" accept=".zip,application/zip" multiple>
+      </label>
+      <div id="pk-out"></div>
 
-      <div id="preview" hidden>
-        <h2>미리보기 · 수정</h2>
-        <div id="report"></div>
-        <div id="pv-fields"></div>
-        <div class="row">
-          <button type="button" id="pv-cancel">취소</button>
-          <button type="button" id="pv-save" class="primary">저장</button>
+      <details id="manual">
+        <summary>PC 없이 직접 입력 (예비 방법)</summary>
+        <p class="muted">처리기를 쓸 수 없을 때만 사용하세요. 기호(❌✅💡)로 교정을 찾고, 필요하면 AI 채팅에 복사·붙여넣기로 정리합니다. 이 방법으로는 스크립트·표현 업그레이드·복습 문제가 만들어지지 않습니다(기본 문제로 복습).</p>
+        <form id="import-form" autocomplete="off">
+          <label>녹음 파일 (mp4 / m4a)
+            <input type="file" id="f-audio" accept=".mp4,.m4a,audio/mp4,video/mp4">
+          </label>
+          <p id="f-audio-info" class="muted"></p>
+          <label>채팅 (복사해서 붙여넣기)
+            <textarea id="f-chat" rows="6"></textarea>
+          </label>
+          <label>코멘트 (복사해서 붙여넣기)
+            <textarea id="f-comment" rows="6"></textarea>
+          </label>
+          <label>수업 날짜
+            <input type="date" id="f-date">
+          </label>
+          <button type="submit" class="primary">변환 미리보기</button>
+        </form>
+
+        <div id="preview" hidden>
+          <h2>미리보기 · 수정</h2>
+          <div id="report"></div>
+          <details id="ai-panel" class="ai">
+            <summary>AI로 교정 찾기 <span id="ai-hint" class="badge" hidden>추천</span></summary>
+            <ol class="steps">
+              <li>가릴 이름을 입력하고 요청 문장 만들기</li>
+              <li>복사해서 AI 채팅(Claude 등)에 붙여넣기</li>
+              <li>AI 답변 전체를 복사해 아래에 붙여넣고 적용 → 확인 후 저장</li>
+            </ol>
+            <label>추가로 가릴 단어 (선생님 이름 등, 쉼표로 구분)
+              <input type="text" id="ai-mask" autocomplete="off" maxlength="300">
+            </label>
+            <button type="button" id="ai-make" class="wide">1. 요청 문장 만들기</button>
+            <div id="ai-out" hidden>
+              <p id="ai-mask-info" class="muted"></p>
+              <textarea id="ai-prompt" rows="6" readonly aria-label="AI 요청 문장"></textarea>
+              <button type="button" id="ai-copy" class="primary wide">2. 복사하기</button>
+              <label>3. AI 답변 붙여넣기
+                <textarea id="ai-result" rows="6" autocomplete="off" spellcheck="false"></textarea>
+              </label>
+              <label>사용한 AI (선택, 기록용)
+                <input type="text" id="ai-provider" maxlength="40" placeholder="예: Claude">
+              </label>
+              <button type="button" id="ai-apply" class="primary wide">적용</button>
+            </div>
+            <p id="ai-msg" role="status"></p>
+          </details>
+          <div id="pv-fields"></div>
+          <div class="row">
+            <button type="button" id="pv-cancel">취소</button>
+            <button type="button" id="pv-save" class="primary">저장</button>
+          </div>
         </div>
-      </div>
-      <p id="import-msg" role="status"></p>
+        <p id="import-msg" role="status"></p>
+      </details>
     </section>
 
     <!-- 설정 -->
     <section id="view-settings" class="view" hidden>
-      <h2>백업</h2>
-      <p id="bk-last" class="muted"></p>
-      <label class="check"><input type="checkbox" id="bk-audio" checked> 녹음 파일 포함 (끄면 용량이 작아지지만 녹음은 복원되지 않음)</label>
-      <button type="button" id="bk-export" class="primary wide">백업 ZIP 내보내기</button>
-      <p id="bk-msg" class="muted" role="status"></p>
-      <p class="muted">백업 파일에는 수업 녹음·내용이 들어 있습니다. 개인 저장공간(내 휴대폰, 개인 클라우드)에만 보관하고 GitHub 등 공개된 곳에는 올리지 마세요.</p>
-
-      <h2>백업 복원</h2>
-      <label>백업 ZIP 선택
-        <input type="file" id="rs-file" accept=".zip,application/zip">
+      <h2>학습 기록</h2>
+      <p class="muted">휴대폰에만 있는 복습 기록(간격·풀이 이력·오답)을 파일로 저장합니다. 앱을 다시 설치하거나 휴대폰을 바꿀 때: 수업 패키지를 다시 가져온 뒤 이 파일을 가져오면 이어서 복습할 수 있습니다. 수업 내용·녹음은 들어 있지 않습니다.</p>
+      <p id="pg-last" class="muted"></p>
+      <button type="button" id="pg-export" class="primary wide">학습 기록 내보내기 (JSON)</button>
+      <label>학습 기록 가져오기 (합치기)
+        <input type="file" id="pg-file" accept=".json,application/json">
       </label>
-      <div id="rs-preview" hidden>
-        <div id="rs-summary"></div>
-        <fieldset id="rs-policy" class="policy">
-          <legend>이미 있는 수업과 ID가 같을 때</legend>
-          <label class="check"><input type="radio" name="rs-policy" value="skip" checked> 기기에 있는 것 유지(건너뛰기)</label>
-          <label class="check"><input type="radio" name="rs-policy" value="overwrite"> 백업으로 덮어쓰기</label>
-        </fieldset>
-        <button type="button" id="rs-apply" class="primary wide">복원하기</button>
-      </div>
-      <p id="rs-msg" role="status"></p>
+      <p id="pg-msg" role="status"></p>
+      <button type="button" id="anki-export">Anki용 TSV 내보내기</button>
 
       <h2>앱</h2>
       <p id="app-info" class="muted"></p>
@@ -185,7 +202,7 @@
     <!-- 휴지통 -->
     <section id="view-trash" class="view" hidden>
       <button type="button" data-view="settings" class="link go">← 설정</button>
-      <p class="muted">휴지통의 수업은 목록에 보이지 않습니다. 복원하거나 영구 삭제할 수 있습니다.</p>
+      <p class="muted">휴지통의 수업은 목록·복습에 보이지 않습니다. 복원하거나 영구 삭제할 수 있습니다.</p>
       <ul id="trash" class="cards"></ul>
     </section>
   </main>

@@ -1,0 +1,45 @@
+{
+ "schemaVersion": 2,
+ "id": "wk_2026W40",
+ "from": "2026-09-26",
+ "to": "2026-10-02",
+ "lessonIds": [
+  "les_20260928_01"
+ ],
+ "highlightsKo": [
+  "mind를 활용한 표현을 배웠습니다.",
+  "bored/boring 차이를 익혔습니다.",
+  "call it a day 등 관용구를 배웠습니다."
+ ],
+ "topExpressions": [
+  {
+   "text": "Don't mind me",
+   "meaningKo": "신경 쓰지 마세요",
+   "lessonId": "les_20260928_01"
+  }
+ ],
+ "repeatedMistakes": [
+  {
+   "patternKo": "감정 형용사 -ed/-ing 혼동",
+   "tipKo": "내가 느끼면 -ed",
+   "examples": [
+    {
+     "original": "I am boring",
+     "corrected": "I am bored"
+    }
+   ]
+  }
+ ],
+ "focusNextWeekKo": [
+  "관사 사용에 주의하기"
+ ],
+ "generator": {
+  "tool": "langdy-processor",
+  "version": "1.0.0",
+  "createdAt": "2026-10-02T12:44:08Z",
+  "llm": {
+   "provider": "mock",
+   "model": "mock-1"
+  }
+ }
+}
